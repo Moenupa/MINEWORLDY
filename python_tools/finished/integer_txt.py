@@ -1,9 +1,12 @@
-
+'''
 import os
 os.chdir('C:\Drive_comp\python_work')
+#changing workdir if needed
 print(os.getcwd())
+#showing current workdir if needed
+'''
 integers=[]
-for i in open('integer.txt'):
+for i in open('integer_test.txt'):
     integers.append(i.strip('\n'))
 
 print('Type integers, each followed by Enter;  or ^D or ^Z to finish.')

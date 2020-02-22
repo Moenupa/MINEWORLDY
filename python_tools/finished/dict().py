@@ -4,7 +4,7 @@ favorite_languages = {
     'edward':['ruby','go'],
     'phil':['python','haskell'],
     }
-for name,languages  in favorite_languages.items():
+for name,languages in favorite_languages.items():
     print('\n'+name.title()+"'sfavorite language are:")
     for language in languages:
         print('\t'+language.title())

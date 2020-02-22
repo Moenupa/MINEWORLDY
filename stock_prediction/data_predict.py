@@ -4,6 +4,7 @@
 
 2019/12/19 18:30
 '''
+#plz use the filename as your input
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
