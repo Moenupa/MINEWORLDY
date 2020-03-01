@@ -13,7 +13,7 @@ The learning outcome in Class COMP1901. [Direct](https://github.com/Moenupa/MINE
 - stock data
 
 ## Python tools
-Learning outcome in Class COMP1002. [Direct]https://github.com/Moenupa/MINEWORLDY/master/python_tools/python_tools.md) Relevant tags:
+Learning outcome in Class COMP1002. [Direct](https://github.com/Moenupa/MINEWORLDY/master/python_tools/python_tools.md) Relevant tags:
 - Python
 - Tools
 - Interesting features
