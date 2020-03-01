@@ -5,7 +5,7 @@ MINEWORLDY is used for personal purposes as a way of showing coding learning res
 ----
 
 ## Stock Prediction
-The learning outcome in Class COMP1901. [Direct](https://github.com/Moenupa/MINEWORLDY/master/stock_prediction/info_links.md) Relevant tags: 
+The learning outcome in Class COMP1901. [Direct](https://github.com/Moenupa/MINEWORLDY/blob/master/stock_prediction/info_links.md) Relevant tags: 
 - machine learning
 - data mining
 - python, orange(software), excel
@@ -13,7 +13,7 @@ The learning outcome in Class COMP1901. [Direct](https://github.com/Moenupa/MINE
 - stock data
 
 ## Python tools
-Learning outcome in Class COMP1002. [Direct](https://github.com/Moenupa/MINEWORLDY/master/python_tools/python_tools.md) Relevant tags:
+Learning outcome in Class COMP1002. [Direct](https://github.com/Moenupa/MINEWORLDY/blob/master/python_tools/python_tools.md) Relevant tags:
 - Python
 - Tools
 - Interesting features
