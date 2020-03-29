@@ -1,3 +1,29 @@
+'''
+A quiz about probability
+number of cases are big
+so solve in python codes instead
+below is the question (Q1)
+'''
+
+'''
+Question 1: Coins in a Bag. There are 10 coins in a bag, where 5 of them are one-dollar
+coins, 3 five-dollar coins, and 2 ten-dollar coins. We assume that each coin has equal chances
+to be taken out of the bag. (Total: 45’)
+(a) We randomly take out two coins c1 and c2 (at once) from the bag, please describe the
+sample space S reflecting the value sum of c1 and c2. (5’)
+(b) We take out the two coins sequentially without putting back, first c1 then c2. What is the
+probability that the value of c1 is larger than c2. (5’)
+(c) We sequentially take out a coin, record the value, and put it back. We will stop till the
+value sum of the coins taken out is ≥ 10 dollars. Let X denote number of coins taken out till
+stop. What is P(X ≤ 3)? (10’)
+(d) To continue the story in (c), let Y denotes the value sum of the coins taken out till stop.
+Are X and Y independent? Why? (5’)
+(e) We have defined X and Y in (c) and (d). What is the expected value and standard
+deviation of Y , i.e., E[Y ] and σ(Y ). (10’)
+(f) To continue with (e), how about the covariance of X and Y , i.e., Cov(X, Y )? (10’)
+
+'''
+
 def cutleaf(loop_obj):
     if sum(loop_obj[:-1]) >= 10:
         del loop_obj[-1]
