@@ -18,3 +18,9 @@ Learning outcome in Class COMP1002. [Direct](https://github.com/Moenupa/MINEWORL
 - Tools
 - Interesting features
 - Fun Learning
+
+## Resources
+The latest upload contains personal icon resources, to help set some json files. Relevant tags:
+- One More
+- Mine World
+- Moenupa WANG
