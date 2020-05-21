@@ -1,37 +1,40 @@
+# @author: WANG Meng
+# R Script for <COMP1433 A2Q1>
+
 f1 <- function (x=1,n=3) {
     sum = 0
     for (i in 1:n) {
-        sum += i*x**i
+        sum = sum + i*x**i
     }
-    return sum
+    return(sum)
 }
 
 f2 <- function (x) {
     sum = 0
     if (length(x)==0) {
-        return NA
+        return(NA)
     }
     for (i in x) {
-        if (x % 2 == 0 or x % 3 == 0) {
-            sum += i
+        if (i %% 2== 0 || i %% 3== 0) {
+            sum = sum + i
         }
     }
-    return sum
+    return(sum)
 }
 
-f3 <- function (x,n) {
-    sort(x,decreasing=TRUE)
-    return x[n]
+f3 <- function (x,n=1) {
+    x = sort(x,decreasing=TRUE)
+    return(x[n])
 }
 
 f4 <- function (x) {
-    sort(x,decreasing=TRUE)
-    if (x[length(x)] < 0) {
-        return NA
+    x = sort(x)
+    if (x[1] < 0) {
+        return(NA)
     }
-    groups = prod(x[1]:sum(x))
-    for (i in 2:length(x)) {
-        groups /= prod(1:x[i])
+    groups = factorial(sum(x))
+    for (i in x) {
+        groups = groups/factorial(i)
     }
-    return groups
+    return(groups)
 }
