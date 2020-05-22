@@ -1,226 +1,174 @@
 # -*- coding: utf-8 -*-
-'''
-@Author: Moenupa
+# @Author: Moenupa 2019/05/21
 
-2019/12/19 18:30
-'''
-#plz use the filename as your input
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from xgboost import XGBRegressor
-from sklearn.linear_model import LinearRegression, RidgeCV, LassoCV, LassoLarsCV, ElasticNetCV, SGDRegressor
-from sklearn.ensemble import AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor, ExtraTreesRegressor, RandomForestRegressor, StackingRegressor
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.svm import SVR, LinearSVR, NuSVR
-from sklearn.model_selection import train_test_split, GridSearchCV
-from mlxtend.regressor import StackingCVRegressor
+from xgboost import XGBClassifier
+from sklearn.linear_model import RidgeClassifierCV
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, RandomForestClassifier, StackingClassifier, RandomForestRegressor, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC, LinearSVC, NuSVC
+from mlxtend.classifier import StackingCVClassifier
 from sklearn import metrics
-from sklearn.neural_network import MLPRegressor
-models = {
-    'ADA': 'AdaBoostRegressor',
-    'BG': 'BaggingRegressor',
-    'DT': 'DecisionTreeRegressor',
-    'EN': 'ElasticNetCV',
-    'ET': 'ExtraTreesRegressor',
-    'GB': 'GradientBoostingRegressor',
-    'KN': 'KNeighborsRegressor',
-    'LLS': 'LassoLarsCV',
-    'LR': 'LinearRegression',
-    'LS': 'LassoCV',
-    'NN': 'Neural Network',
-    'NSVR': 'NuSupportVectorRegressor',
-    'RD': 'RidgeCV',
-    'RF': 'RandomForestRegressor',
-    'ST': 'StackingRegressor',
-    'ST2': 'StackingCVRegressor',
-    'XG': 'XGBRegressor',
-    'SVR':'SVR'
-    }
-def cpn_sep():
-    print('-'*8)
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import GridSearchCV
+
+
+
 def func_procs():
-    global depth_whole, depth_hist, depth_valid
-    #input
-    while True:
-        try:
-            name = input('Stock Name:\t')
-            #'D:\Drive_comp\Data\HK2800_O.csv'
-            depth_hist = int(input('Train Size:\t'))
-            cpn_sep()
+    try:
+        dir = "C:\\Github\\MINEWORLDY\\titanic\\"
+        X_train = pd.read_csv(open(dir + "train.csv")).loc[
+                :,
+                ["PassengerId", "Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
+            ]
+        y_train = pd.read_csv(open(dir + "train.csv")).loc[:, "Survived"]
+        X_test = pd.read_csv(open(dir+"test.csv")).loc[
+                :,
+                ["PassengerId", "Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
+            ]
+    except ValueError:
+        print("VE")
+    except FileNotFoundError:
+        print("FE")
 
-        except ValueError:
-            cpn_sep()
+    return X_train, y_train, X_test
+def num_replace(X_train, X_test):
+    X_train.loc[X_train['Sex']=='male','Sex'] = 1
+    X_train.loc[X_train['Sex'] == 'female', 'Sex'] = 2
+    X_train.loc[X_train['Embarked'] == 'S', 'Embarked'] = 1
+    X_train.loc[X_train['Embarked'] == 'C', 'Embarked'] = 2
+    X_train.loc[X_train['Embarked'] == 'Q', 'Embarked'] = 3
+    X_test.loc[X_test['Sex']=='male','Sex'] = 1
+    X_test.loc[X_test['Sex'] == 'female', 'Sex'] = 2
+    X_test.loc[X_test['Embarked'] == 'S', 'Embarked'] = 1
+    X_test.loc[X_test['Embarked'] == 'C', 'Embarked'] = 2
+    X_test.loc[X_test['Embarked'] == 'Q', 'Embarked'] = 3
+    return X_train, X_test
+def impute(X_train, X_test):
+    imputer_age, imputer_emb, imputer_fare = RandomForestRegressor(), RandomForestClassifier(), RandomForestRegressor()
 
-    #process data
-        try:
-            dataset = pd.read_csv(open('{0}.csv'.format(name.upper()))).dropna().loc[:,['Date','Close']]
-            break
-        except FileNotFoundError:
-            continue
-    data = dataset['Close'].tolist()
-    depth_whole = len(data)
-    depth_valid = depth_whole - depth_hist
+    dataset1 = X_train.drop(columns=['Age']).dropna().astype('float')
+    imputer_emb.fit(
+        dataset1.loc[:, ['Pclass','Fare']],
+        dataset1.loc[:, 'Embarked']
+        )
+    imputer_fare.fit(
+        dataset1.loc[:, ['Pclass','Embarked']],
+        dataset1.loc[:, 'Fare']
+        )
+    nanpos = np.where(X_train.isna())
+    split = [[], [], []]
+    for i in range(len(nanpos[0])):
+        row, col = nanpos[0][i], nanpos[1][i]
+        if col == 7:
+            split[0].append(row)
+        elif col == 6:
+            split[1].append(row)
+        elif col == 3:
+            split[2].append(row)
+    try:
+        X_train.iloc[split[0], 7] = imputer_emb.predict(X_train.iloc[split[0], [1, 6]])
+        X_train.iloc[split[1], 6] = imputer_fare.predict(X_train.iloc[split[1], [1, 7]])
+    except ValueError:
+        X_train.fillna(0, inplace = True)
+    dataset2 = X_train.dropna()
+    imputer_age.fit(
+        dataset2.loc[:, ['Pclass', "SibSp", "Parch", "Fare"]],
+        dataset2.loc[:, 'Age']
+        )
+    X_train.iloc[split[2], 3] = imputer_age.predict(X_train.iloc[split[2], [1, 4, 5, 6]])
 
-    #real data table
-    dict_df = {'y-{0}'.format(depth_hist-iter_y):data[iter_y:iter_y+depth_valid] for iter_y in range(depth_hist+1)}
-    df = pd.DataFrame(dict_df)
-    df.insert(0, 'Date', dataset['Date'].tolist()[depth_hist:])
+    nanpos = np.where(X_test.isna())
+    split = [[], [], []]
+    for i in range(len(nanpos[0])):
+        row, col = nanpos[0][i], nanpos[1][i]
+        if col == 7:
+            split[0].append(row)
+        elif col == 6:
+            split[1].append(row)
+        elif col == 3:
+            split[2].append(row)
+    try:
+        X_test.iloc[split[0], 7] = imputer_emb.predict(X_test.iloc[split[0], [1, 6]])
+        X_test.iloc[split[1], 6] = imputer_fare.predict(X_test.iloc[split[1], [1, 7]])
+    except ValueError:
+        X_test.fillna(0, inplace = True)
+    X_test.iloc[split[2], 3] = imputer_age.predict(X_test.iloc[split[2], [1, 4, 5, 6]])
 
-    return dataset, df
-
-def func_split(df):
-    global train_s, train_e, test_s, test_e
-    print('\tValid Depth:\t'+str(depth_valid))
-    print('\tWhole Depth:\t'+str(depth_whole))
-    while True:
-        try:
-            print('\tTrain Start:End, Test Start:End')
-            train_s, train_e, test_s, test_e = map(int,input('Input Range:\t').split(' '))
-            if 0<=train_s<=depth_valid and 0<=train_e<=depth_valid and 0<=test_s<=depth_valid and 0<=test_e<=depth_valid and train_s<train_e and test_s<test_e:
-                break
-            else:
-                continue
-        except ValueError:
-            continue
-
-    X_train, y_train, X_test, y_test = df.iloc[train_s:train_e,1:-1].values, df.iloc[train_s:train_e,-1].values, df.iloc[test_s:test_e,1:-1].values, df.iloc[test_s:test_e,-1].values
-
-    cpn_sep()
-
-    return X_train, y_train, X_test, y_test
+    X_train.loc[:,['Sex','Embarked']] = X_train.loc[:,['Sex','Embarked']].astype(int)
+    X_test.loc[:,['Sex','Embarked']] = X_test.loc[:,['Sex','Embarked']].astype(int)
+    return X_train, X_test
 
 def main():
-    global model, models
-    while True:
-        dataset, df = func_procs()
-        X_train, y_train, X_test, y_test = func_split(df)
-        print(df)
-        avg_y_test = y_test.mean()
-        print('Average Test Value:\t{0}'.format(avg_y_test))
-        cpn_sep()
+    global models
+    X_train, y_train, X_test = func_procs()
 
-        dict_record = {}
-        report = pd.DataFrame(columns = ['EVS', 'MSE', 'RMSE','MAE', 'R2','R2-adj','MAPE','CVC'])
-        for model in models.keys():
-            reg = func_model(X_train,y_train)
-            y_pred = reg.predict(X_test)
-            dict_record[model] = y_pred
-            temp_list = func_error(y_test,y_pred)
-            report.loc[models[model]] = temp_list
-        cpn_sep()
-
-        print(report)
-        cpn_sep()
-
-        func_select()
-        cpn_sep()
-        while model != 'E':
-            y_pred = dict_record[model]
-            func_show(dataset,y_train,y_test,y_pred)
-            func_select()
-
-def func_select():
-    global model, models
-    while True:
-        for key in sorted(models.keys()):
-            print('\t{0}: \t{1}'.format(key,models[key]))
-        model = input('Select Regressor: \t').upper()
-
-        if model in models.keys():
-            break
-        elif model == 'E':
-            break
-        else:
-            continue
-def func_model(X_train,y_train):
+    X_train, X_test = num_replace(X_train, X_test)
+    X_train, X_test = impute(X_train, X_test)
+    # saving processed X_train data
+    X_train.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_train_proc.csv", index=False)
+    X_test.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_test_proc.csv", index=False)
+    models = ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
+    for model in models:
+        classifier = train_model(model, X_train.drop(columns=['PassengerId']), y_train)
+        y_pred = classifier.predict(X_test.drop(columns=['PassengerId']))
+        result = pd.concat([X_test, pd.DataFrame(y_pred, columns=["Survived"])], axis=1)
+        print("\t{0}\t{1}".format(model, sum(y_pred)/152-1))
+        result.to_csv("C:\\Github\\MINEWORLDY\\titanic\\output\\data\\{0}_data.csv".format(model), index=False)
+        result.loc[:,['PassengerId','Survived']].to_csv("C:\\Github\\MINEWORLDY\\titanic\\output\\{0}_output.csv".format(model), index=False)
+def train_model(model, X_train, y_train):
     '''
     Process one model by training data
     Input: X_train,y_train
     Output: regressor by the need
     '''
-    global model
     if model == 'XG':
-        reg = XGBRegressor()
-    elif model == 'RD':
-        reg = RidgeCV(alphas=(0.1, 1.0, 10.0), fit_intercept=True, normalize=False,
-              scoring=None, cv=5, gcv_mode=None, store_cv_values=False)
-    elif model == 'LS':
-        reg = LassoCV(max_iter = 10**8)
-    elif model == 'LLS':
-        reg = LassoLarsCV()
+        clsfr = XGBClassifier()
     elif model == 'ADA':
-        reg = AdaBoostRegressor()
-    elif model == 'EN':
-        reg = ElasticNetCV()
+        clsfr = AdaBoostClassifier()
     elif model == 'DT':
-        reg = DecisionTreeRegressor(criterion="mse", splitter="best", max_depth=None,
-            min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0,
-            max_features=None, random_state=None, max_leaf_nodes=None,
-            min_impurity_decrease=0.0, min_impurity_split=None)
-    elif model == 'SVR':
-        reg = SVR()
+        clsfr = DecisionTreeClassifier()
+    elif model == 'SVC':
+        clsfr = SVC()
     elif model == 'KN':
-        reg = KNeighborsRegressor(n_neighbors=5, weights="uniform", algorithm="auto",
+        clsfr = KNeighborsClassifier(n_neighbors=5, weights="uniform", algorithm="auto",
             leaf_size=30, p=2, metric="minkowski", metric_params=None)
     elif model == 'BG':
-        reg = BaggingRegressor(base_estimator=LassoCV(max_iter = 10**8), n_estimators=10, max_samples=1.0,
-            max_features=1.0, bootstrap=True, bootstrap_features=False,
-            oob_score=False, warm_start=True, random_state=None, verbose=0)
-    elif model == 'GB':
-        reg = GradientBoostingRegressor(loss="ls", learning_rate=0.1, n_estimators=100,
-            subsample=1.0, criterion="friedman_mse", min_samples_split=2,
-            min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_depth=3,
-            min_impurity_decrease=0.0, min_impurity_split=None, init=None,
-            random_state=None, max_features=None, alpha=0.9, verbose=0,
-            max_leaf_nodes=None, warm_start=False,
-            validation_fraction=0.1, n_iter_no_change=None, tol=0.0001)
+        clsfr = BaggingClassifier(base_estimator=MLPClassifier())
     elif model == 'ET':
-        reg = ExtraTreesRegressor()
+        clsfr = ExtraTreesClassifier()
     elif model == 'RF':
-        reg = RandomForestRegressor()
+        clsfr = RandomForestClassifier()
     elif model == 'ST':
         estimators = [
-            ('ADA',AdaBoostRegressor()),
-            ('LS',LassoCV(max_iter = 10**8)),
-            ('LLS',LassoLarsCV()),
-            ('RD',RidgeCV()),
-            ('XG',XGBRegressor()),
-            ('KN',KNeighborsRegressor())
+            ('MLP',MLPClassifier()),
+            ('RF',RandomForestClassifier()),
+            ('XG',XGBClassifier()),
+            ('ADA',AdaBoostClassifier())
         ]
-        reg = StackingRegressor(estimators=estimators)
-    elif model == 'NSVR':
-        reg = NuSVR()
+        clsfr = StackingClassifier(estimators=estimators)
+    elif model == 'NSVC':
+        clsfr = NuSVC()
+    elif model == 'LSVC':
+        clsfr = LinearSVC()
     elif model == 'ST2':
-        estimators = [RidgeCV(), AdaBoostRegressor(), LassoCV(max_iter = 10**8), LassoLarsCV(), XGBRegressor(), KNeighborsRegressor(),ElasticNetCV()]
-        reg = StackingCVRegressor(regressors = estimators, meta_regressor = LassoCV(max_iter = 10**8))
-    elif model == 'LR':
-        reg = LinearRegression()
-    elif model == 'NN':
-        reg = MLPRegressor(learning_rate = 'adaptive', max_iter = 1000)
-    reg.fit(X_train,y_train)
-    return reg
-def func_error(y_test,y_pred):
-    global depth_hist, test_e, test_s
-    mae = metrics.mean_absolute_error(y_test,y_pred)
-    mse = metrics.mean_squared_error(y_test,y_pred)
-    r2 = metrics.r2_score(y_test,y_pred)
-    evs = metrics.explained_variance_score(y_test,y_pred)
-    r2_adjusted = 1-(1-r2)*(test_e-test_s-1)/(test_e-test_s-depth_hist-1)
-    mape = np.mean(np.abs((y_test - y_pred)/y_test*100))
-    cc = np.corrcoef(y_test,y_pred)[0][1]
-    return [evs,mse,mse**0.5,mae,r2,r2_adjusted, mape,cc]
-def func_show(dataset,y_train,y_test,y_pred):
-    '''
-    '''
-    global depth_whole, train_s, train_e, test_s, test_e, depth_hist
-    plt.plot(list(range(depth_whole)), dataset['Close'].tolist(), 'y:', label = 'All Historical Data')
-    plt.plot(list(range(train_s+depth_hist,train_e+depth_hist)), y_train, 'g-', label = 'Training Data')
-    plt.plot(list(range(test_s+depth_hist,test_e+depth_hist)), y_test, 'b-', label = 'Testing Data')
-    plt.plot(list(range(test_s+depth_hist,test_e+depth_hist)), y_pred, 'r-', label = 'Predicting Data')
-    plt.legend(loc = 'best')
-    plt.show()
-    cpn_sep()
+        estimators = [
+            XGBClassifier(),
+            AdaBoostClassifier(),
+            RandomForestClassifier(),
+            MLPClassifier()]
+        clsfr = StackingCVClassifier(classifiers = estimators, meta_classifier = MLPClassifier())
+    elif model == 'MLP':
+        clsfr = MLPClassifier(learning_rate='adaptive', max_iter=1000)
+    elif model == 'GB':
+        clsfr = GradientBoostingClassifier()
+
+    clsfr.fit(X_train,y_train)
+    return clsfr
+
 if __name__ == "__main__":
     main()
