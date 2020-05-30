@@ -103,13 +103,12 @@ def impute(X_train, X_test):
 
 def main():
     X_train, y_train, X_test = func_procs()
-
     X_train, X_test = num_replace(X_train, X_test)
     X_train, X_test = impute(X_train, X_test)
     # saving processed X_train data
     X_train.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_train_proc.csv", index=False)
     X_test.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_test_proc.csv", index=False)
-    models = ["RF"]
+    models = ["XG"]
     # models = ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
     for model in models:
         classifier = train_model(model, X_train.drop(columns=['PassengerId']), y_train)
@@ -125,7 +124,7 @@ def train_model(model, X_train, y_train):
     Output: regressor by the need
     '''
     if model == 'XG':
-        clsfr = XGBClassifier()
+        clsfr = XGBClassifier(n_estimators=400,max_depth=6, learning_rate=0.05, subsample=0.9, colsample_bytree=0.65, min_child_weight=11)
     elif model == 'ADA':
         clsfr = AdaBoostClassifier()
     elif model == 'DT':
