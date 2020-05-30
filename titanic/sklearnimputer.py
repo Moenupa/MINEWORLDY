@@ -44,15 +44,11 @@ def func_procs():
     #imp_mean.fit(X_train)
     #imp_mean.transform(X_train)
     #imp_mean.transform(X_test)
-    median = pd.concat([X_train.loc[:, "Age"], X_test.loc[:, "Age"]], axis = 1).median
-    X_train.loc[:, "Age"].fillna(median)
-    X_test.loc[:, "Age"].fillna(median)
-    median = X_train.loc[:, "Fare"].median
-    X_train.loc[:, "Fare"].fillna(median)
-    X_test.loc[:, "Fare"].fillna(median)
-    median = X_train.loc[:, "Embarked"].median
-    X_train.loc[:, "Embarked"].fillna(median)
-    X_test.loc[:, "Embarked"].fillna(median)
+    age_median = X_train["Age"].median()
+    fare_median = X_train["Fare"].median()
+    emb_median = X_train["Embarked"].median()
+    X_train = X_train.fillna({'Age': age_median, 'Fare': fare_median, 'Embarked': emb_median})
+    X_test = X_test.fillna({'Age':age_median, 'Fare':fare_median, 'Embarked':emb_median})
     X_train = X_train.to_csv(dir + "X_train_median_proc.csv")
     X_test = X_test.to_csv(dir + "X_test_median_proc.csv")
     print("Output Complete.")

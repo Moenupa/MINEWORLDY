@@ -24,7 +24,7 @@ def main():
     X_train = pd.read_csv(dir + "X_train_median_proc.csv")
     y_train = pd.read_csv(dir + "train.csv").loc[:, "Survived"]
     X_test = pd.read_csv(dir + "X_test_median_proc.csv")
-    models = ["RF"]
+    models = ["XG"]
     # all models: ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
     for model in models:
 
