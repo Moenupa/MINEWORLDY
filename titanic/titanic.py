@@ -16,6 +16,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import auc
 
+dir = "C:\\Github\\MINEWORLDY\\titanic\\"
 def func_procs():
     try:
         dir = "C:\\Github\\MINEWORLDY\\titanic\\"
@@ -102,12 +103,14 @@ def impute(X_train, X_test):
     return X_train, X_test
 
 def main():
+    global dir
     X_train, y_train, X_test = func_procs()
     X_train, X_test = num_replace(X_train, X_test)
     X_train, X_test = impute(X_train, X_test)
     # saving processed X_train data
-    X_train.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_train_proc.csv", index=False)
-    X_test.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_test_proc.csv", index=False)
+
+    X_train.to_csv(dir + "X_train_proc.csv", index=False)
+    X_test.to_csv(dir + "X_test_proc.csv", index=False)
     models = ["XG"]
     # models = ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
     for model in models:
@@ -115,8 +118,8 @@ def main():
         y_pred = classifier.predict(X_test.drop(columns=['PassengerId']))
         result = pd.concat([X_test, pd.DataFrame(y_pred, columns=["Survived"])], axis=1)
         print("\t{0}\t{1}".format(model, sum(y_pred)/152-1))
-        result.to_csv("C:\\Github\\MINEWORLDY\\titanic\\output\\data\\{0}_data.csv".format(model), index=False)
-        result.loc[:,['PassengerId','Survived']].to_csv("C:\\Github\\MINEWORLDY\\titanic\\output\\{0}_output.csv".format(model), index=False)
+        result.to_csv(dir + "output\\data\\{0}_data.csv".format(model), index=False)
+        result.loc[:,['PassengerId','Survived']].to_csv(dir + "output\\{0}_output.csv".format(model), index=False)
 def train_model(model, X_train, y_train):
     '''
     Process one model by training data

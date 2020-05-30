@@ -16,18 +16,18 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
 
 def main():
-
-    X_train = pd.read_csv("C:\\Github\\MINEWORLDY\\titanic\\X_train_proc.csv")
-    y_train = pd.read_csv(open("C:\\Github\\MINEWORLDY\\titanic\\train.csv")).loc[:, "Survived"]
+    dir = "C:\\Github\\MINEWORLDY\\titanic\\"
+    X_train = pd.read_csv(dir + "X_train_proc.csv")
+    y_train = pd.read_csv(open(dir + "train.csv")).loc[:, "Survived"]
     param_dict = {
-        'n_estimators':[400],
-        'max_depth':[6],
-        'learning_rate':[0.05],
-        'subsample':[0.9],
-        'colsample_bytree':[0.65],
-        'min_child_weight':[11]
+        'n_estimators':[340],
+        'max_depth':[9],
+        'random_state': [0],
+        'min_samples_split': [2],
+        'min_samples_leaf': [2],
+        'min_weight_fraction_leaf': [0],
     }
-    classifier = XGBClassifier()
+    classifier = RandomForestClassifier()
     grid = GridSearchCV(classifier, param_dict, scoring = 'roc_auc', n_jobs = -1, refit=True)
     grid.fit(X_train, y_train)
     print(grid.best_score_)
