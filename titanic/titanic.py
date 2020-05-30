@@ -3,7 +3,6 @@
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from xgboost import XGBClassifier
 from sklearn.linear_model import RidgeClassifierCV
 from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, RandomForestClassifier, StackingClassifier, RandomForestRegressor, GradientBoostingClassifier
@@ -15,8 +14,6 @@ from mlxtend.classifier import StackingCVClassifier
 from sklearn import metrics
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
-
-
 
 def func_procs():
     try:
@@ -104,7 +101,6 @@ def impute(X_train, X_test):
     return X_train, X_test
 
 def main():
-    global models
     X_train, y_train, X_test = func_procs()
 
     X_train, X_test = num_replace(X_train, X_test)
@@ -112,11 +108,14 @@ def main():
     # saving processed X_train data
     X_train.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_train_proc.csv", index=False)
     X_test.to_csv("C:\\Github\\MINEWORLDY\\titanic\\X_test_proc.csv", index=False)
-    models = ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
+    models = ["RF"]
+    # models = ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
     for model in models:
         classifier = train_model(model, X_train.drop(columns=['PassengerId']), y_train)
         y_pred = classifier.predict(X_test.drop(columns=['PassengerId']))
         result = pd.concat([X_test, pd.DataFrame(y_pred, columns=["Survived"])], axis=1)
+
+        GridSearchCV(classifier, )
         print("\t{0}\t{1}".format(model, sum(y_pred)/152-1))
         result.to_csv("C:\\Github\\MINEWORLDY\\titanic\\output\\data\\{0}_data.csv".format(model), index=False)
         result.loc[:,['PassengerId','Survived']].to_csv("C:\\Github\\MINEWORLDY\\titanic\\output\\{0}_output.csv".format(model), index=False)
@@ -138,7 +137,7 @@ def train_model(model, X_train, y_train):
         clsfr = KNeighborsClassifier(n_neighbors=5, weights="uniform", algorithm="auto",
             leaf_size=30, p=2, metric="minkowski", metric_params=None)
     elif model == 'BG':
-        clsfr = BaggingClassifier(base_estimator=MLPClassifier())
+        clsfr = BaggingClassifier(base_estimator=RandomForestClassifier())
     elif model == 'ET':
         clsfr = ExtraTreesClassifier()
     elif model == 'RF':
