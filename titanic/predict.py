@@ -21,9 +21,9 @@ dir = "C:\\Github\\MINEWORLDY\\titanic\\"
 def main():
     global dir
     # saving processed X_train data
-    X_train = pd.read_csv(dir + "X_train_median_proc.csv")
-    y_train = pd.read_csv(dir + "train.csv").loc[:, "Survived"]
-    X_test = pd.read_csv(dir + "X_test_median_proc.csv")
+    X_train = pd.read_csv(open(dir + "X_train_median_proc.csv"))
+    y_train = pd.read_csv(open(dir + "train.csv")).loc[:, "Survived"]
+    X_test = pd.read_csv(open(dir + "X_test_median_proc.csv"))
     models = ["XG"]
     # all models: ["XG","ADA","BG","ET","RF","ST","KN","DT", "SVC", "LSVC", "NSVC", "ST2", "MLP", "GB"]
     for model in models:

@@ -1,0 +1,19 @@
+sex:
+	male : 1
+	female : 2
+embarked:
+	S: 1
+	C: 2
+	Q: 3
+title:
+	Mr : 1
+	Mrs : 2
+	Miss : 3
+	Master : 4
+	Others : 5
+age group
+	15- : 1
+	15+ 45- : 2
+	45+ 55- : 3
+	55+ 65- : 4
+	65+ : 5
