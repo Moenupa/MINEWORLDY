@@ -1,3 +1,4 @@
+'''
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 mid = [2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 77.5]
@@ -14,3 +15,24 @@ plt.plot(mid[:-3], female_rate[:-3], 'r', label="Female Survival Rate")
 
 plt.plot(mid, male_rate, 'y', label="Male Survival Rate")
 plt.show()
+'''
+def isPrime(n): 
+    if n <= 1: 
+        return False
+    for i in range(2, int(n**0.5) + 1): 
+        if n % i == 0: 
+            return False
+    return True
+
+
+if __name__ == "__main__":
+    upbound = int(input("input message"))
+    string = ""
+    count = 0
+
+    for i in range(upbound, 0, -1):
+        if not isPrime(i):
+            string = count * " " + str(i) + "\n" + string
+            count += 1
+            
+    print(string[:-1])
